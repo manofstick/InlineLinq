@@ -97,7 +97,7 @@ public class Where
     [TestMethod]
     public void SourceImmutableArray()
     {
-        static Enumeratorable<int, γImmutableArray<int>> getContainer(IEnumerable<int> e) =>
+        static Enumeratorable<int, γArray<int>> getContainer(IEnumerable<int> e) =>
             System.Collections.Immutable.ImmutableArray.ToImmutableArray(e).ToInlineLinq();
 
         var empty = getContainer(Empty);

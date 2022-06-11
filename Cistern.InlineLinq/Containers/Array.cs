@@ -1,13 +1,16 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Cistern.InlineLinq.Utils;
+using System.Collections.Immutable;
+using System.Runtime.CompilerServices;
 
 namespace Cistern.InlineLinq
 {
     public struct γArray<T>
         : IEnumeratorable<T>
     {
-        public T[] Array { get; }
+        public ReadOnlyArray<T> Array { get; }
 
-        public γArray(T[] array) => (Array, _index) = (array, int.MinValue);
+        public γArray(T[] array) => (Array, _index) = (ReadOnlyArray<T>.Create(array), int.MinValue);
+        public γArray(ImmutableArray<T> array) => (Array, _index) = (ReadOnlyArray<T>.Create(array), int.MinValue);
 
         private int _index;
         public void Initialize() => _index = -1;
