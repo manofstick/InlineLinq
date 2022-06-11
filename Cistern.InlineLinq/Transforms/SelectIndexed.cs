@@ -2,20 +2,22 @@
 
 namespace Cistern.InlineLinq.Transforms;
 
-public struct γSelect<T, U, TEnumeratorable>
+public struct γSelectIndexed<T, U, TEnumeratorable>
     : IEnumeratorable<U>
     where TEnumeratorable : struct, IEnumeratorable<T>
 {
     public TEnumeratorable Inner { get; }
-    public Func<T, U> Selector { get; }
+    public Func<T, int, U> Selector { get; }
 
-    public γSelect(TEnumeratorable original, Func<T, U> selector) =>
-        (Inner, Selector, _current) = (original, selector, default);
+    public γSelectIndexed(TEnumeratorable original, Func<T, int, U> selector) =>
+        (Inner, Selector, _current, _index) = (original, selector, default, int.MinValue);
 
 
     private TEnumeratorable _current;
+    private int _index;
     public void Initialize()
     {
+        _index = 0;
         _current = Inner;
         _current.Initialize();
     }
@@ -23,6 +25,7 @@ public struct γSelect<T, U, TEnumeratorable>
     {
         _current.Dispose();
         _current = default;
+        _index = int.MinValue;
     }
 
     public int? TryGetCount(out int? count) => Inner.TryGetCount(out count);
@@ -32,7 +35,7 @@ public struct γSelect<T, U, TEnumeratorable>
     {
         if (_current.TryGetNext(out var t))
         {
-            current = Selector(t);
+            current = Selector(t, _index++);
             return true;
         }
         current = default!;
@@ -45,4 +48,3 @@ public struct γSelect<T, U, TEnumeratorable>
         return false;
     }
 }
-

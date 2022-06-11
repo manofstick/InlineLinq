@@ -1,7 +1,7 @@
 ﻿namespace Cistern.InlineLinq.Tests.Vanilla;
 
 [TestClass]
-public class Select
+public class SelectIndexed
 {
     static readonly IEnumerable<int> Empty =
         System.Linq.Enumerable.Empty<int>();
@@ -13,12 +13,12 @@ public class Select
     {
         var select =
             emptyContainer
-            .Select(_ => true);
+            .Select((_, idx) => true);
 
         UsingStructEnumerator(select);
         UsingEnumerable(select.GetEnumerable());
 
-        static void UsingStructEnumerator(in Enumeratorable<bool, Transforms.γSelect<int, bool, TEnumeratorable>> select)
+        static void UsingStructEnumerator(in Enumeratorable<bool, Transforms.γSelectIndexed<int, bool, TEnumeratorable>> select)
         {
             foreach (var item in select)
                 Assert.Fail();
@@ -36,32 +36,28 @@ public class Select
     {
         var select =
             zeroToTenContainer
-            .Select(n => (decimal)n * 2);
+            .Select((n, idx) => (decimal)n * idx);
 
         UsingStructEnumerator(select);
         UsingEnumerable(select.GetEnumerable());
 
-        static void UsingStructEnumerator(in Enumeratorable<decimal, Transforms.γSelect<int, decimal, TEnumeratorable>> select)
+        static void UsingStructEnumerator(in Enumeratorable<decimal, Transforms.γSelectIndexed<int, decimal, TEnumeratorable>> select)
         {
-            var check = 0M;
             var count = 0;
             foreach (var item in select)
             {
-                Assert.AreEqual(check, item);
-                check += 2M;
-                count += 1;
+                Assert.AreEqual(count * count, item);
+                ++count;
             }
             Assert.AreEqual(11, count);
         }
 
         static void UsingEnumerable(IEnumerable<decimal> select)
         {
-            var check = 0M;
             var count = 0;
             foreach (var item in select)
             {
-                Assert.AreEqual(check, item);
-                check += 2M;
+                Assert.AreEqual(count * count, item);
                 count += 1;
             }
             Assert.AreEqual(11, count);
