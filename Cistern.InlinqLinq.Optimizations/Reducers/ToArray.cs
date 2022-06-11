@@ -1,4 +1,5 @@
 ﻿using Cistern.InlineLinq.Transforms;
+using Cistern.InlineLinq.Utils;
 using System.Buffers;
 
 namespace Cistern.InlineLinq.Optimizations;
@@ -25,16 +26,17 @@ public static partial class Reducers
         }
     }
 
-    private static U[] ToArray<TEnumeratorable, T, U>(TEnumeratorable enumeratorable, Func<T, bool> predicate, Func<T, U> selector)
+    private static U[] ToArray<TEnumeratorable, T, U>(TEnumeratorable enumeratorable, Func<T, bool> predicate, Func<T, U> selector, ArrayPool<U>? maybeArrayPool, int? upperBound)
         where TEnumeratorable : struct, IEnumeratorable<T>
     {
-        var result = new List<U>();
+        Builder<U>.MemoryChunk memoryChunk = new();
+        var builder = new Builder<U>(maybeArrayPool, memoryChunk.GetBufferofBuffers(), memoryChunk.GetBufferOfItems(), upperBound);
         while (enumeratorable.TryGetNext(out var item))
         {
             if (predicate(item))
-                result.Add(selector(item));
+                builder.Add(selector(item));
         }
-        return result.ToArray();
+        return builder.ToArray();
     }
 
     private static U[] ToArray<TEnumeratorable, T, U>(TEnumeratorable enumeratorable, Func<T, U> selector, int count)
@@ -49,10 +51,11 @@ public static partial class Reducers
         return result;
     }
 
-    private static U[] ToArray<TEnumeratorable, T, U>(TEnumeratorable enumeratorable, Func<T, U> selector)
+    private static U[] ToArray<TEnumeratorable, T, U>(TEnumeratorable enumeratorable, Func<T, U> selector, ArrayPool<U>? maybeArrayPool, int? upperBound)
         where TEnumeratorable : struct, IEnumeratorable<T>
     {
-        var builder = new List<U>();
+        Builder<U>.MemoryChunk memoryChunk = new ();
+        var builder = new Builder<U>(maybeArrayPool, memoryChunk.GetBufferofBuffers(), memoryChunk.GetBufferOfItems(), upperBound);
         while (enumeratorable.TryGetNext(out var item))
         {
             builder.Add(selector(item));
@@ -83,16 +86,21 @@ public static partial class Reducers
 
             return ToArray(span, select.Selector);
         }
-        else if (enumeratorable.TryGetCount(out var count))
-        {
-            if (count == 0)
-                return Array.Empty<U>();
-
-            return ToArray(enumeratorable, select.Selector, count);
-        }
         else
         {
-            return ToArray(enumeratorable, select.Selector);
+            var maybeCount = enumeratorable.TryGetCount(out var upperBound);
+            if (maybeCount.HasValue)
+            {
+                var count = maybeCount.Value;
+                if (count == 0)
+                    return Array.Empty<U>();
+
+                return ToArray(enumeratorable, select.Selector, count);
+            }
+            else
+            {
+                return ToArray(enumeratorable, select.Selector, null, upperBound);
+            }
         }
     }
 
@@ -110,9 +118,13 @@ public static partial class Reducers
 
             return ToArray(span, where.Predicate, select.Selector);
         }
-        else if (enumeratorable.TryGetCount(out var count) && (count == 0))
-            return Array.Empty<U>();
+        else
+        {
+            var maybeCount = enumeratorable.TryGetCount(out var upperBound);
+            if (maybeCount == 0)
+                return Array.Empty<U>();
 
-        return ToArray(enumeratorable, where.Predicate, select.Selector);
+            return ToArray(enumeratorable, where.Predicate, select.Selector, null, upperBound);
+        }
     }
 }

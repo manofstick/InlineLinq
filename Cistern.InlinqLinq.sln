@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cistern.InlineLinq", "Ciste
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cistern.InlineLinq.Optimizations", "Cistern.InlinqLinq.Optimizations\Cistern.InlineLinq.Optimizations.csproj", "{FA53C5FF-F2E6-4B31-B305-F4D15BE68E17}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cistern.InlineLinq.Tests", "Cistern.InlineLinq.Tests\Cistern.InlineLinq.Tests.csproj", "{C119EEFC-99BB-4B96-BDF8-59C7FDD6C397}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{FA53C5FF-F2E6-4B31-B305-F4D15BE68E17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA53C5FF-F2E6-4B31-B305-F4D15BE68E17}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA53C5FF-F2E6-4B31-B305-F4D15BE68E17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C119EEFC-99BB-4B96-BDF8-59C7FDD6C397}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C119EEFC-99BB-4B96-BDF8-59C7FDD6C397}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C119EEFC-99BB-4B96-BDF8-59C7FDD6C397}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C119EEFC-99BB-4B96-BDF8-59C7FDD6C397}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

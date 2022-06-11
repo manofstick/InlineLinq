@@ -7,12 +7,21 @@
 
         public Enumeratorable(TEnumeratorable enumeratorable) => Inner = enumeratorable;
 
-        public struct Enumerator
+        public struct Enumerator : IDisposable
         {
             TEnumeratorable _enumeratorable;
             T _current;
 
-            public Enumerator(TEnumeratorable enumeratorable) => (_enumeratorable, _current) = (enumeratorable, default!);
+            public Enumerator(in TEnumeratorable enumeratorable)
+            {
+                (_enumeratorable, _current) = (enumeratorable, default!);
+                _enumeratorable.Initialize();
+            }
+
+            public void Dispose()
+            {
+                _enumeratorable.Dispose();
+            }
 
             public T Current => _current;
 

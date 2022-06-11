@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace Cistern.InlineLinq.Utils;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-struct Elements<T>
+public struct Elements<T>
 {
     public T _01;
     public T _02;
@@ -40,7 +40,7 @@ struct Elements<T>
     public const int NumberOfElements = 30;
 }
 
-ref struct Builder<T>
+public ref struct Builder<T>
 {
     public ref struct MemoryChunk
     {

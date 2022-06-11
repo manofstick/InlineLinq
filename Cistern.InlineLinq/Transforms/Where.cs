@@ -29,7 +29,7 @@ public struct γWhere<T, TEnumeratorable>
     public int? TryGetCount(out int? upperBound)
     {
         Inner.TryGetCount(out upperBound);
-        return default;
+        return upperBound == 0 ? 0 : null;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
