@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 
 namespace Cistern.InlineLinq.Utils;
@@ -141,5 +142,29 @@ public ref struct Builder<T>
         }
 
         return array;
+    }
+
+    public ImmutableArray<T> ToImmutableArray()
+    {
+        if (_count == 0)
+            return ImmutableArray<T>.Empty;
+
+        var array = ImmutableArray.CreateBuilder<T>(_count);
+
+        var head = _root[..Math.Min(_count, _root.Length)];
+        foreach (var item in head)
+            array.Add(item);
+        for (var idx = 0; idx < _bufferCount - 1; ++idx)
+            array.AddRange(_buffers[idx]!);
+        if (_bufferCount > 0)
+        { 
+            var tail =
+                _buffers[_bufferCount - 1]
+                .AsSpan(0, _nextIdx);
+            foreach (var item in tail)
+                array.Add(item);
+        }
+
+        return array.MoveToImmutable();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,9 +26,9 @@ public class ToArray
     {
         System.Linq.Enumerable.Empty<int>(),
         System.Linq.Enumerable.Range(0, 1),
-        System.Linq.Enumerable.Range(0, 100),
+        System.Linq.Enumerable.Range(0, 1000),
         System.Linq.Enumerable.Repeat(int.MaxValue, 10),
-        System.Linq.Enumerable.Repeat(int.MinValue, 10),
+        System.Linq.Enumerable.Repeat(int.MinValue, 1000),
     };
 
     static readonly Func<int, bool>[] Wheres = new Func<int, bool>[]
@@ -141,16 +142,6 @@ public class ToArray
     }
 
     [TestMethod]
-    public void SourceImmutableArray()
-    {
-        static Enumeratorable<int, γArray<int>> getContainer(IEnumerable<int> e) =>
-            System.Collections.Immutable.ImmutableArray.ToImmutableArray(e).ToInlineLinq();
-
-        foreach (var source in Sources)
-            RunChecks(source, getContainer(source));
-    }
-
-    [TestMethod]
     public void SourceEnumerable()
     {
         static Enumeratorable<int, γEnumerable<int>> getContainer(IEnumerable<int> e) =>
@@ -158,5 +149,35 @@ public class ToArray
 
         foreach (var source in Sources)
             RunChecks(source, getContainer(source));
+    }
+
+    static private void DifferentLengthChecks<TEnumeratorable>(Func<IEnumerable<int>, Enumeratorable<int, TEnumeratorable>> getEnumeratorable)
+        where TEnumeratorable : struct, IEnumeratorable<int>
+    {
+        for (var count = 0; count < 200; ++count)
+        {
+            var source = Enumerable.Range(0, count);
+
+            var select = getEnumeratorable(source).Select(x => x * 2).ToArray();
+            Assert.AreEqual(count, select.Length);
+
+            var selectWhere = getEnumeratorable(source).Select(x => x * 2).Where(x => true).ToArray();
+            Assert.AreEqual(count, selectWhere.Length);
+
+            var where = getEnumeratorable(source).Where(x => true).ToArray();
+            Assert.AreEqual(count, where.Length);
+
+            var whereSelect = getEnumeratorable(source).Where(x => true).Select(x => x * 2).ToArray();
+            Assert.AreEqual(count, whereSelect.Length);
+        }
+    }
+
+    [TestMethod]
+    public void TryDifferentLengthBoundaries()
+    {
+        DifferentLengthChecks(source => source.ToArray().ToInlineLinq());
+        DifferentLengthChecks(source => source.ToInlineLinq());
+        DifferentLengthChecks(source => source.ToList().ToInlineLinq());
+        DifferentLengthChecks(source => source.ToImmutableArray().ToInlineLinq());
     }
 }

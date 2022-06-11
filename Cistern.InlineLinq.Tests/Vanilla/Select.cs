@@ -95,19 +95,6 @@ public class Select
     }
 
     [TestMethod]
-    public void SourceImmutableArray()
-    {
-        static Enumeratorable<int, γArray<int>> getContainer(IEnumerable<int> e) =>
-            System.Collections.Immutable.ImmutableArray.ToImmutableArray(e).ToInlineLinq();
-
-        var empty = getContainer(Empty);
-        EmptyCheck(empty);
-
-        var zeroToTen = getContainer(ZeroToTen);
-        ZeroToTenCheck(zeroToTen);
-    }
-
-    [TestMethod]
     public void SourceEnumerable()
     {
         static Enumeratorable<int, γEnumerable<int>> getContainer(IEnumerable<int> e) =>

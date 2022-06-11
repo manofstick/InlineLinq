@@ -3,7 +3,7 @@
 namespace Cistern.InlineLinq.Tests.Vanilla;
 
 [TestClass]
-public class ToList
+public class ToImmutableArray
 {
     static readonly IEnumerable<int>[] Sources = new IEnumerable<int>[]
     {
@@ -38,12 +38,12 @@ public class ToList
             var expected =
                 enumerable
                 .Where(where)
-                .ToList();
+                .ToImmutableArray();
 
             var check =
                 enumeratorable
                 .Where(where)
-                .ToList();
+                .ToImmutableArray();
 
             Assert.IsTrue(System.Linq.Enumerable.SequenceEqual(expected, check));
         }
@@ -53,12 +53,12 @@ public class ToList
             var expected =
                 enumerable
                 .Select(select)
-                .ToList();
+                .ToImmutableArray();
 
             var check =
                 enumeratorable
                 .Select(select)
-                .ToList();
+                .ToImmutableArray();
 
             Assert.IsTrue(System.Linq.Enumerable.SequenceEqual(expected, check));
         }
@@ -71,13 +71,13 @@ public class ToList
                     enumerable
                     .Where(where)
                     .Select(select)
-                    .ToList();
+                    .ToImmutableArray();
 
                 var check =
                     enumeratorable
                     .Where(where)
                     .Select(select)
-                    .ToList();
+                    .ToImmutableArray();
 
                 Assert.IsTrue(System.Linq.Enumerable.SequenceEqual(expected, check));
             }
@@ -91,13 +91,13 @@ public class ToList
                     enumerable
                     .Select(select)
                     .Where(where)
-                    .ToList();
+                    .ToImmutableArray();
 
                 var check =
                     enumeratorable
                     .Select(select)
                     .Where(where)
-                    .ToList();
+                    .ToImmutableArray();
 
                 Assert.IsTrue(System.Linq.Enumerable.SequenceEqual(expected, check));
             }
@@ -110,7 +110,7 @@ public class ToList
         static Enumeratorable<int, γArray<int>> getContainer(IEnumerable<int> e) =>
             System.Linq.Enumerable.ToArray(e).ToInlineLinq();
 
-        foreach(var source in Sources)
+        foreach (var source in Sources)
             RunChecks(source, getContainer(source));
     }
 
@@ -141,17 +141,17 @@ public class ToList
         {
             var source = Enumerable.Range(0, count);
 
-            var select = getEnumeratorable(source).Select(x => x * 2).ToList();
-            Assert.AreEqual(count, select.Count);
+            var select = getEnumeratorable(source).Select(x => x * 2).ToImmutableArray();
+            Assert.AreEqual(count, select.Length);
 
-            var selectWhere = getEnumeratorable(source).Select(x => x * 2).Where(x => true).ToList();
-            Assert.AreEqual(count, selectWhere.Count);
+            var selectWhere = getEnumeratorable(source).Select(x => x * 2).Where(x => true).ToImmutableArray();
+            Assert.AreEqual(count, selectWhere.Length);
 
-            var where = getEnumeratorable(source).Where(x => true).ToList();
-            Assert.AreEqual(count, where.Count);
+            var where = getEnumeratorable(source).Where(x => true).ToImmutableArray();
+            Assert.AreEqual(count, where.Length);
 
-            var whereSelect = getEnumeratorable(source).Where(x => true).Select(x => x * 2).ToList();
-            Assert.AreEqual(count, whereSelect.Count);
+            var whereSelect = getEnumeratorable(source).Where(x => true).Select(x => x * 2).ToImmutableArray();
+            Assert.AreEqual(count, whereSelect.Length);
         }
     }
 
@@ -160,7 +160,7 @@ public class ToList
     {
         DifferentLengthChecks(source => source.ToArray().ToInlineLinq());
         DifferentLengthChecks(source => source.ToInlineLinq());
-        DifferentLengthChecks(source => source.ToList().ToInlineLinq());
+        DifferentLengthChecks(source => source.ToImmutableArray().ToInlineLinq());
         DifferentLengthChecks(source => source.ToImmutableArray().ToInlineLinq());
     }
 }
