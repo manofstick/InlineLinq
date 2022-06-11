@@ -1,26 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Cistern.InlineLinq.Tests.Vanilla;
+﻿namespace Cistern.InlineLinq.Tests.Vanilla;
 
 [TestClass]
-public class ToArray
+public class ToList
 {
-    [TestMethod]
-    public void EmptyReturnsArrayDotEmpty()
-    {
-        var shouldBeEmpty =
-            System.Linq.Enumerable.Range(0, 100)
-            .ToInlineLinq()
-            .Where(_ => false)
-            .ToArray();
-
-        Assert.AreSame(Array.Empty<int>(), shouldBeEmpty);
-    }
-
     static readonly IEnumerable<int>[] Sources = new IEnumerable<int>[]
     {
         System.Linq.Enumerable.Empty<int>(),
@@ -54,12 +36,12 @@ public class ToArray
             var expected =
                 enumerable
                 .Where(where)
-                .ToArray();
+                .ToList();
 
             var check =
                 enumeratorable
                 .Where(where)
-                .ToArray();
+                .ToList();
 
             Assert.IsTrue(System.Linq.Enumerable.SequenceEqual(expected, check));
         }
@@ -69,12 +51,12 @@ public class ToArray
             var expected =
                 enumerable
                 .Select(select)
-                .ToArray();
+                .ToList();
 
             var check =
                 enumeratorable
                 .Select(select)
-                .ToArray();
+                .ToList();
 
             Assert.IsTrue(System.Linq.Enumerable.SequenceEqual(expected, check));
         }
@@ -87,13 +69,13 @@ public class ToArray
                     enumerable
                     .Where(where)
                     .Select(select)
-                    .ToArray();
+                    .ToList();
 
                 var check =
                     enumeratorable
                     .Where(where)
                     .Select(select)
-                    .ToArray();
+                    .ToList();
 
                 Assert.IsTrue(System.Linq.Enumerable.SequenceEqual(expected, check));
             }
@@ -107,13 +89,13 @@ public class ToArray
                     enumerable
                     .Select(select)
                     .Where(where)
-                    .ToArray();
+                    .ToList();
 
                 var check =
                     enumeratorable
                     .Select(select)
                     .Where(where)
-                    .ToArray();
+                    .ToList();
 
                 Assert.IsTrue(System.Linq.Enumerable.SequenceEqual(expected, check));
             }

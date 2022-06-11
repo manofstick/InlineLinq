@@ -1,110 +1,122 @@
-﻿namespace Cistern.InlineLinq.Tests.Vanilla
+﻿namespace Cistern.InlineLinq.Tests.Vanilla;
+
+[TestClass]
+public class Where
 {
-    [TestClass]
-    public class Where
+    static readonly IEnumerable<int> Empty =
+        System.Linq.Enumerable.Empty<int>();
+    static readonly IEnumerable<int> ZeroToTen = 
+        System.Linq.Enumerable.Range(0, 11);
+
+    static private void EmptyCheck<TEnumeratorable>(in Enumeratorable<int, TEnumeratorable> zeroToTenContainer)
+        where TEnumeratorable : struct, IEnumeratorable<int>
     {
-        static readonly IEnumerable<int> Empty =
-            System.Linq.Enumerable.Empty<int>();
-        static readonly IEnumerable<int> ZeroToTen = 
-            System.Linq.Enumerable.Range(0, 11);
+        var where =
+            zeroToTenContainer
+            .Where(_ => true);
 
-        static private void EmptyCheck<TEnumeratorable>(in Enumeratorable<int, TEnumeratorable> zeroToTenContainer)
-            where TEnumeratorable : struct, IEnumeratorable<int>
+        UsingStructEnumerator(where);
+        UsingEnumerable(where.GetEnumerable());
+
+        static void UsingStructEnumerator(in Enumeratorable<int, Transforms.γWhere<int, TEnumeratorable>> where)
         {
-            var where =
-                zeroToTenContainer
-                .Where(_ => true);
+            foreach (var item in where)
+                Assert.Fail();
+        }
 
-            UsingStructEnumerator(where);
-            UsingEnumerable(where.GetEnumerable());
+        static void UsingEnumerable(IEnumerable<int> where)
+        {
+            foreach (var item in where)
+                Assert.Fail();
+        }
+    }
 
-            static void UsingStructEnumerator(in Enumeratorable<int, Transforms.γWhere<int, TEnumeratorable>> where)
+    static private void ZeroToTenCheck<TEnumeratorable>(in Enumeratorable<int, TEnumeratorable> zeroToTenContainer)
+        where TEnumeratorable : struct, IEnumeratorable<int>
+    {
+        var where =
+            zeroToTenContainer
+            .Where(n => n % 2 == 0);
+
+        UsingStructEnumerator(where);
+        UsingEnumerable(where.GetEnumerable());
+
+        static void UsingStructEnumerator(in Enumeratorable<int, Transforms.γWhere<int, TEnumeratorable>> where)
+        {
+            var check = 0;
+            var count = 0;
+            foreach (var item in where)
             {
-                foreach (var item in where)
-                    Assert.Fail();
+                Assert.AreEqual(check, item);
+                check += 2;
+                count += 1;
             }
+            Assert.AreEqual(6, count);
+        }
 
-            static void UsingEnumerable(IEnumerable<int> where)
+        static void UsingEnumerable(IEnumerable<int> where)
+        {
+            var check = 0;
+            var count = 0;
+            foreach (var item in where)
             {
-                foreach (var item in where)
-                    Assert.Fail();
+                Assert.AreEqual(check, item);
+                check += 2;
+                count += 1;
             }
+            Assert.AreEqual(6, count);
         }
+    }
 
-        static private void ZeroToTenCheck<TEnumeratorable>(in Enumeratorable<int, TEnumeratorable> zeroToTenContainer)
-            where TEnumeratorable : struct, IEnumeratorable<int>
-        {
-            var where =
-                zeroToTenContainer
-                .Where(n => n % 2 == 0);
+    [TestMethod]
+    public void SourceArray()
+    {
+        static Enumeratorable<int, γArray<int>> getContainer(IEnumerable<int> e) =>
+            System.Linq.Enumerable.ToArray(e).ToInlineLinq();
 
-            UsingStructEnumerator(where);
-            UsingEnumerable(where.GetEnumerable());
+        var empty = getContainer(Empty);
+        EmptyCheck(empty);
 
-            static void UsingStructEnumerator(in Enumeratorable<int, Transforms.γWhere<int, TEnumeratorable>> where)
-            {
-                var check = 0;
-                var count = 0;
-                foreach (var item in where)
-                {
-                    Assert.AreEqual(check, item);
-                    check += 2;
-                    count += 1;
-                }
-                Assert.AreEqual(6, count);
-            }
+        var zeroToTen = getContainer(ZeroToTen);
+        ZeroToTenCheck(zeroToTen);
+    }
 
-            static void UsingEnumerable(IEnumerable<int> where)
-            {
-                var check = 0;
-                var count = 0;
-                foreach (var item in where)
-                {
-                    Assert.AreEqual(check, item);
-                    check += 2;
-                    count += 1;
-                }
-                Assert.AreEqual(6, count);
-            }
-        }
+    [TestMethod]
+    public void SourceList()
+    {
+        static Enumeratorable<int, γList<int>> getContainer(IEnumerable<int> e) =>
+            System.Linq.Enumerable.ToList(e).ToInlineLinq();
 
-        [TestMethod]
-        public void SourceArray()
-        {
-            static Enumeratorable<int, γArray<int>> getContainer(IEnumerable<int> e) =>
-                System.Linq.Enumerable.ToArray(e).ToInlineLinq();
+        var empty = getContainer(Empty);
+        EmptyCheck(empty);
 
-            var empty = getContainer(Empty);
-            EmptyCheck(empty);
+        var zeroToTen = getContainer(ZeroToTen);
+        ZeroToTenCheck(zeroToTen);
+    }
 
-            var zeroToTen = getContainer(ZeroToTen);
-            ZeroToTenCheck(zeroToTen);
-        }
+    [TestMethod]
+    public void SourceImmutableArray()
+    {
+        static Enumeratorable<int, γImmutableArray<int>> getContainer(IEnumerable<int> e) =>
+            System.Collections.Immutable.ImmutableArray.ToImmutableArray(e).ToInlineLinq();
 
-        [TestMethod]
-        public void SourceList()
-        {
-            static Enumeratorable<int, γList<int>> getContainer(IEnumerable<int> e) =>
-                System.Linq.Enumerable.ToList(e).ToInlineLinq();
+        var empty = getContainer(Empty);
+        EmptyCheck(empty);
 
-            var empty = getContainer(Empty);
-            EmptyCheck(empty);
+        var zeroToTen = getContainer(ZeroToTen);
+        ZeroToTenCheck(zeroToTen);
+    }
 
-            var zeroToTen = getContainer(ZeroToTen);
-            ZeroToTenCheck(zeroToTen);
-        }
+    [TestMethod]
+    public void SourceEnumerable()
+    {
+        static Enumeratorable<int, γEnumerable<int>> getContainer(IEnumerable<int> e) =>
+            e.ToInlineLinq();
 
-        [TestMethod]
-        public void SourceImmutableArray()
-        {
-            static Enumeratorable<int, γImmutableArray<int>> getContainer(IEnumerable<int> e) =>
-                System.Collections.Immutable.ImmutableArray.ToImmutableArray(e).ToInlineLinq();
+        var empty = getContainer(Empty);
+        EmptyCheck(empty);
 
-            var empty = getContainer(Empty);
-            EmptyCheck(empty);
-
-            var zeroToTen = getContainer(ZeroToTen);
-            ZeroToTenCheck(zeroToTen);
-        }
+        var zeroToTen = getContainer(ZeroToTen);
+        ZeroToTenCheck(zeroToTen);
     }
 }

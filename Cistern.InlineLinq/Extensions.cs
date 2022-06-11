@@ -6,10 +6,9 @@ namespace Cistern.InlineLinq
     public static class Extensions
     {
         public static Enumeratorable<T, γImmutableArray<T>> ToInlineLinq<T>(this ImmutableArray<T> source) => new(new(source));
-
         public static Enumeratorable<T, γList<T>> ToInlineLinq<T>(this List<T> source) => new(new(source));
-
         public static Enumeratorable<T, γArray<T>> ToInlineLinq<T>(this T[] source) => new(new(source));
+        public static Enumeratorable<T, γEnumerable<T>> ToInlineLinq<T>(this IEnumerable<T> source) => new(new(source));
 
 
         public static Enumeratorable<T, γWhere<T, TEnumeratorable>> Where<T, TEnumeratorable>(this in Enumeratorable<T, TEnumeratorable> source, Func<T, bool> predicate)
