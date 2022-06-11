@@ -1,4 +1,6 @@
-﻿namespace Cistern.InlineLinq
+﻿using System.Collections;
+
+namespace Cistern.InlineLinq
 {
     public struct Enumeratorable<T, TEnumeratorable>
         where TEnumeratorable : struct, IEnumeratorable<T>
@@ -29,5 +31,11 @@
         }
 
         public Enumerator GetEnumerator() => new(Inner);
+
+        public IEnumerable<T> GetEnumerable()
+        {
+            foreach (var t in this)
+                yield return t;
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Running;
+using Cistern.InlineLinq;
 
 namespace Benchmarks
 {
@@ -7,6 +8,13 @@ namespace Benchmarks
 
     public class Program
     {
+        public IEnumerable<int> Test<TEnumeratorable>(Enumeratorable<int, TEnumeratorable> stuff)
+            where TEnumeratorable : struct, IEnumeratorable<int>
+        {
+            foreach (var item in stuff)
+                yield return item;
+        }
+
         public static void Main(string[] args)
         {
             var x = new ListWhereSelectToArray();
