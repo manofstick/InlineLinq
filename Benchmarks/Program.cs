@@ -21,7 +21,7 @@ namespace Benchmarks
             x.N = 1000;
             x.GlobalSetup();
 
-            var summary = BenchmarkRunner.Run<ListWhereSelectToArray>();
+            var summary = BenchmarkRunner.Run<ListWhereIndexedSelectIndexedToArray>();
         }
     }
 }
