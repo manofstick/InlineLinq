@@ -7,7 +7,13 @@ namespace Cistern.InlineLinq
     public struct γMemory<T>
         : IEnumeratorable<T>
     {
-        public ReadOnlySequence<T> Memory { get; }
+        class SequenceContainer
+        {
+            public ReadOnlySequence<T> Sequence;
+            public ReadOnlySequence<T>.Enumerator Enumerator;
+        }
+
+        private object? _internal;
         private readonly int _length;
 
         internal class Segment : ReadOnlySequenceSegment<T>
@@ -24,8 +30,7 @@ namespace Cistern.InlineLinq
 
         public γMemory(ReadOnlySequence<T> sequence)
         {
-            Memory = sequence;
-            _sequenceEnumerator = default;
+            _internal = new SequenceContainer { Sequence = sequence, Enumerator = default };
             _index = int.MinValue;
             
             var length = 0;
@@ -47,20 +52,20 @@ namespace Cistern.InlineLinq
             _length = length;
         }
 
-        public γMemory(ReadOnlyMemory<T> memory) => (Memory, _length, _sequenceEnumerator, _memory, _index) = (new ReadOnlySequence<T>(memory), memory.Length, default, memory, int.MinValue);
+        public γMemory(ReadOnlyMemory<T> memory) => (_internal, _memory, _length, _index) = (null, memory, memory.Length, int.MinValue);
         public γMemory(T[] array) : this(array.AsMemory()) {}
         public γMemory(ImmutableArray<T> array) : this(array.AsMemory()) {}
 
-        private ReadOnlySequence<T>.Enumerator _sequenceEnumerator;
         private ReadOnlyMemory<T> _memory;
         private int _index;
         public void Initialize()
         {
-            if (_memory.Length != _length)
+            if (_internal != null)
             {
-                _sequenceEnumerator = Memory.GetEnumerator();
-                if (_sequenceEnumerator.MoveNext())
-                    _memory = _sequenceEnumerator.Current;
+                var sequence = (SequenceContainer) _internal;
+                sequence.Enumerator = sequence.Sequence.GetEnumerator();
+                if (sequence.Enumerator.MoveNext())
+                    _memory = sequence.Enumerator.Current;
                 else
                     _memory = ReadOnlyMemory<T>.Empty;
             }
@@ -69,9 +74,10 @@ namespace Cistern.InlineLinq
         public void Dispose()
         {
             _index = int.MinValue;
-            if (_memory.Length != _length)
+            if (_internal != null)
             {
-                _sequenceEnumerator = default;
+                var sequence = (SequenceContainer)_internal;
+                sequence.Enumerator = default;
                 _memory = ReadOnlyMemory<T>.Empty;
             }
         }
@@ -97,9 +103,9 @@ namespace Cistern.InlineLinq
 
         private bool TryGetNextChangeMemory(out T current)
         {
-            if (_memory.Length != _length && _sequenceEnumerator.MoveNext())
+            if (_internal is SequenceContainer sequence && sequence.Enumerator.MoveNext())
             {
-                _memory = _sequenceEnumerator.Current;
+                _memory = sequence.Enumerator.Current;
                 _index = -1;
                 return TryGetNext(out current);
             }
