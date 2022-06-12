@@ -132,6 +132,24 @@ public class ToArray
     }
 
     [TestMethod]
+    public void SourceSequence()
+    {
+        static Enumeratorable<int, γMemory<int>> getContainer(IEnumerable<int> e)
+        {
+            var asArray =
+                System.Linq.Enumerable.ToArray(
+                    System.Linq.Enumerable.Select(
+                        e,
+                        x => (ReadOnlyMemory<int>)new[] { x }));
+
+            return asArray.ToInlineLinqOfT();
+        }
+
+        foreach (var source in Sources)
+            RunChecks(source, getContainer(source));
+    }
+
+    [TestMethod]
     public void SourceList()
     {
         static Enumeratorable<int, γList<int>> getContainer(IEnumerable<int> e) =>

@@ -1,4 +1,6 @@
-﻿namespace Cistern.InlineLinq.Tests.Vanilla;
+﻿using System.Buffers;
+
+namespace Cistern.InlineLinq.Tests.Vanilla;
 
 [TestClass]
 public class Select
@@ -73,6 +75,27 @@ public class Select
     {
         static Enumeratorable<int, γMemory<int>> getContainer(IEnumerable<int> e) =>
             System.Linq.Enumerable.ToArray(e).ToInlineLinq();
+
+        var empty = getContainer(Empty);
+        EmptyCheck(empty);
+
+        var zeroToTen = getContainer(ZeroToTen);
+        ZeroToTenCheck(zeroToTen);
+    }
+
+    [TestMethod]
+    public void SourceSequence()
+    {
+        static Enumeratorable<int, γMemory<int>> getContainer(IEnumerable<int> e)
+        {
+            var asArray =
+                System.Linq.Enumerable.ToArray(
+                    System.Linq.Enumerable.Select(
+                        e,
+                        x => (ReadOnlyMemory<int>)new[] { x }));
+
+            return asArray.ToInlineLinqOfT();
+        }
 
         var empty = getContainer(Empty);
         EmptyCheck(empty);

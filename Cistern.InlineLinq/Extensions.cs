@@ -1,13 +1,34 @@
 ﻿using Cistern.InlineLinq.Transforms;
+using System.Buffers;
 using System.Collections.Immutable;
 
 namespace Cistern.InlineLinq
 {
     public static class Extensions
     {
+        public static Enumeratorable<T, γMemory<T>> ToInlineLinqOfT<T>(this IEnumerable<ReadOnlyMemory<T>> source)
+        {
+            var asArray =
+                source.ToInlineLinq().ToArray();
+
+            if (asArray.Length == 0)
+                return new(new(Array.Empty<T>()));
+            else if (asArray.Length == 1)
+                return new(new(asArray[0]));
+            else
+            {
+                var first = new γMemory<T>.Segment(asArray[0]);
+                var current = first;
+                for (var i = 1; i < asArray.Length; ++i)
+                    current = current.Append(asArray[i]);
+                return new (new (new ReadOnlySequence<T>(first, 0, current, current.Memory.Length)));
+            }
+        }
+        public static Enumeratorable<T, γMemory<T>> ToInlineLinq<T>(this ReadOnlySequence<T> source) => new(new(source));
+        public static Enumeratorable<T, γMemory<T>> ToInlineLinq<T>(this ReadOnlyMemory<T> source) => new(new(source));
+        public static Enumeratorable<T, γMemory<T>> ToInlineLinq<T>(this T[] source) => new(new(source));
         public static Enumeratorable<T, γMemory<T>> ToInlineLinq<T>(this ImmutableArray<T> source) => new(new(source));
         public static Enumeratorable<T, γList<T>> ToInlineLinq<T>(this List<T> source) => new(new(source));
-        public static Enumeratorable<T, γMemory<T>> ToInlineLinq<T>(this T[] source) => new(new(source));
         public static Enumeratorable<T, γEnumerable<T>> ToInlineLinq<T>(this IEnumerable<T> source) => new(new(source));
 
         // ----------------------------------------------------------------------------------------------------------

@@ -94,6 +94,28 @@ public class Where
         ZeroToTenCheck(zeroToTen);
     }
 
+
+    [TestMethod]
+    public void SourceSequence()
+    {
+        static Enumeratorable<int, γMemory<int>> getContainer(IEnumerable<int> e)
+        {
+            var asArray =
+                System.Linq.Enumerable.ToArray(
+                    System.Linq.Enumerable.Select(
+                        e,
+                        x => (ReadOnlyMemory<int>)new[] { x }));
+
+            return asArray.ToInlineLinqOfT();
+        }
+
+        var empty = getContainer(Empty);
+        EmptyCheck(empty);
+
+        var zeroToTen = getContainer(ZeroToTen);
+        ZeroToTenCheck(zeroToTen);
+    }
+
     [TestMethod]
     public void SourceEnumerable()
     {
