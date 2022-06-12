@@ -220,11 +220,15 @@ namespace Cistern.InlineLinq
         // `IEnumerable<TSource> Union<TSource>(this IEnumerable<TSource> first, IEnumerable<TSource> second, IEqualityComparer<TSource>? comparer);`
         // `IEnumerable<TSource> UnionBy<TSource, TKey>(this IEnumerable<TSource> first, IEnumerable<TSource> second, Func<TSource, TKey> keySelector);`
         // `IEnumerable<TSource> UnionBy<TSource, TKey>(this IEnumerable<TSource> first, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer);`
+
         public static Enumeratorable<T, γWhere<T, TEnumeratorable>> Where<T, TEnumeratorable>(this in Enumeratorable<T, TEnumeratorable> source, Func<T, bool> predicate)
             where TEnumeratorable : struct, IEnumeratorable<T> =>
             new(new(source.Inner, predicate));
 
-        // `IEnumerable<TSource> Where<TSource>(this IEnumerable<TSource> source, Func<TSource, int, bool> predicate);`
+        public static Enumeratorable<T, γWhereIndexed<T, TEnumeratorable>> Where<T, TEnumeratorable>(this in Enumeratorable<T, TEnumeratorable> source, Func<T, int, bool> predicate)
+            where TEnumeratorable : struct, IEnumeratorable<T> =>
+            new(new(source.Inner, predicate));
+
         // `IEnumerable<(TFirst First, TSecond Second, TThird Third)> Zip<TFirst, TSecond, TThird>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second, IEnumerable<TThird> third);`
         // `IEnumerable<(TFirst First, TSecond Second)> Zip<TFirst, TSecond>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second);`
         // `IEnumerable<TResult> Zip<TFirst, TSecond, TResult>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> resultSelector);`
