@@ -6,27 +6,27 @@ using Cistern.InlineLinq;
 namespace Benchmarks
 {
     /*
-|     Method |    N |         Mean |     Error |    StdDev |       Median | Ratio |  Gen 0 | Allocated |
-|----------- |----- |-------------:|----------:|----------:|-------------:|------:|-------:|----------:|
-| SystemLinq |    0 |     89.33 ns |  0.521 ns |  0.462 ns |     89.13 ns |  1.00 | 0.0421 |     176 B |
-| InlineLinq |    0 |     58.98 ns |  0.293 ns |  0.274 ns |     58.80 ns |  0.66 |      - |         - |
-| StructLinq |    0 |     88.10 ns |  0.478 ns |  0.447 ns |     87.85 ns |  0.99 | 0.0229 |      96 B |
-|  HyperLinq |    0 |     38.77 ns |  0.833 ns |  0.779 ns |     38.87 ns |  0.44 |      - |         - |
-|            |      |              |           |           |              |       |        |           |
-| SystemLinq |    1 |    100.13 ns |  0.533 ns |  0.498 ns |     99.83 ns |  1.00 | 0.0421 |     176 B |
-| InlineLinq |    1 |     60.95 ns |  0.067 ns |  0.056 ns |     60.94 ns |  0.61 |      - |         - |
-| StructLinq |    1 |     94.46 ns |  0.337 ns |  0.315 ns |     94.38 ns |  0.94 | 0.0229 |      96 B |
-|  HyperLinq |    1 |     47.05 ns |  0.163 ns |  0.152 ns |     46.94 ns |  0.47 |      - |         - |
-|            |      |              |           |           |              |       |        |           |
-| SystemLinq |   10 |    189.24 ns |  0.733 ns |  0.686 ns |    188.79 ns |  1.00 | 0.0420 |     176 B |
-| InlineLinq |   10 |    143.17 ns |  0.764 ns |  0.715 ns |    143.02 ns |  0.76 |      - |         - |
-| StructLinq |   10 |    150.56 ns |  1.641 ns |  1.370 ns |    150.97 ns |  0.80 | 0.0229 |      96 B |
-|  HyperLinq |   10 |     85.09 ns |  0.443 ns |  0.415 ns |     84.88 ns |  0.45 |      - |         - |
-|            |      |              |           |           |              |       |        |           |
-| SystemLinq | 1000 | 14,607.51 ns | 41.048 ns | 38.396 ns | 14,638.75 ns |  1.00 | 0.0305 |     176 B |
-| InlineLinq | 1000 | 11,571.28 ns | 60.982 ns | 57.043 ns | 11,574.52 ns |  0.79 |      - |         - |
-| StructLinq | 1000 |  9,267.84 ns | 37.301 ns | 33.066 ns |  9,287.36 ns |  0.63 | 0.0153 |      96 B |
-|  HyperLinq | 1000 |  8,897.85 ns | 42.873 ns | 35.801 ns |  8,918.80 ns |  0.61 |      - |         - |
+|     Method |    N |         Mean |     Error |    StdDev | Ratio |  Gen 0 | Allocated |
+|----------- |----- |-------------:|----------:|----------:|------:|-------:|----------:|
+| SystemLinq |    0 |     83.57 ns |  0.093 ns |  0.082 ns |  1.00 | 0.0421 |     176 B |
+| InlineLinq |    0 |     50.53 ns |  0.011 ns |  0.009 ns |  0.60 |      - |         - |
+| StructLinq |    0 |     89.23 ns |  0.260 ns |  0.230 ns |  1.07 | 0.0229 |      96 B |
+|  HyperLinq |    0 |     37.76 ns |  0.124 ns |  0.110 ns |  0.45 |      - |         - |
+|            |      |              |           |           |       |        |           |
+| SystemLinq |    1 |    100.68 ns |  0.302 ns |  0.283 ns |  1.00 | 0.0421 |     176 B |
+| InlineLinq |    1 |     60.24 ns |  0.272 ns |  0.254 ns |  0.60 |      - |         - |
+| StructLinq |    1 |     98.97 ns |  0.051 ns |  0.039 ns |  0.98 | 0.0229 |      96 B |
+|  HyperLinq |    1 |     46.42 ns |  0.247 ns |  0.231 ns |  0.46 |      - |         - |
+|            |      |              |           |           |       |        |           |
+| SystemLinq |   10 |    180.87 ns |  0.638 ns |  0.597 ns |  1.00 | 0.0420 |     176 B |
+| InlineLinq |   10 |    124.53 ns |  0.057 ns |  0.047 ns |  0.69 |      - |         - |
+| StructLinq |   10 |    159.62 ns |  1.074 ns |  1.004 ns |  0.88 | 0.0229 |      96 B |
+|  HyperLinq |   10 |     91.30 ns |  1.383 ns |  1.294 ns |  0.50 |      - |         - |
+|            |      |              |           |           |       |        |           |
+| SystemLinq | 1000 | 14,606.78 ns | 82.641 ns | 77.303 ns |  1.00 | 0.0305 |     176 B |
+| InlineLinq | 1000 | 11,683.48 ns | 35.967 ns | 33.644 ns |  0.80 |      - |         - |
+| StructLinq | 1000 |  9,113.08 ns | 48.597 ns | 45.457 ns |  0.62 | 0.0153 |      96 B |
+|  HyperLinq | 1000 |  8,867.97 ns |  3.532 ns |  2.758 ns |  0.61 |      - |         - |
     */
 
     [Config(typeof(PGOConfig))]

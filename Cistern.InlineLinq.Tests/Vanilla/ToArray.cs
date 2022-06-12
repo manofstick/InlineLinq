@@ -124,7 +124,7 @@ public class ToArray
     [TestMethod]
     public void SourceArray()
     {
-        static Enumeratorable<int, γArray<int>> getContainer(IEnumerable<int> e) =>
+        static Enumeratorable<int, γMemory<int>> getContainer(IEnumerable<int> e) =>
             System.Linq.Enumerable.ToArray(e).ToInlineLinq();
 
         foreach(var source in Sources)

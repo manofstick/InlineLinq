@@ -1,16 +1,15 @@
-﻿using Cistern.InlineLinq.Utils;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 
 namespace Cistern.InlineLinq
 {
-    public struct γArray<T>
+    public struct γMemory<T>
         : IEnumeratorable<T>
     {
-        public ReadOnlyArray<T> Array { get; }
+        public ReadOnlyMemory<T> Memory { get; }
 
-        public γArray(T[] array) => (Array, _index) = (ReadOnlyArray<T>.Create(array), int.MinValue);
-        public γArray(ImmutableArray<T> array) => (Array, _index) = (ReadOnlyArray<T>.Create(array), int.MinValue);
+        public γMemory(T[] array) => (Memory, _index) = (array, int.MinValue);
+        public γMemory(ImmutableArray<T> array) => (Memory, _index) = (array.AsMemory(), int.MinValue);
 
         private int _index;
         public void Initialize() => _index = -1;
@@ -18,7 +17,7 @@ namespace Cistern.InlineLinq
 
         public int? TryGetCount(out int? upperBound)
         {
-            upperBound = Array.Length;
+            upperBound = Memory.Length;
             return upperBound;
         }
 
@@ -26,10 +25,10 @@ namespace Cistern.InlineLinq
         public bool TryGetNext(out T current)
         {
             var nextIdx = _index + 1;
-            if (nextIdx < Array.Length)
+            if (nextIdx < Memory.Length)
             {
                 _index = nextIdx;
-                current = Array[_index];
+                current = Memory.Span[_index];
                 return true;
             }
             current = default!;
@@ -38,7 +37,7 @@ namespace Cistern.InlineLinq
 
         public bool TryGetSpan(out ReadOnlySpan<T> span)
         {
-            span = Array.AsSpan();
+            span = Memory.Span;
             return true;
         }
     }
