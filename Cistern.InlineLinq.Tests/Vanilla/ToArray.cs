@@ -2,7 +2,6 @@
 
 using System.Collections.Immutable;
 using Cistern.InlineLinq;
-using Cistern.InlineLinq.Optimizations;
 
 [TestClass]
 public class ToArray

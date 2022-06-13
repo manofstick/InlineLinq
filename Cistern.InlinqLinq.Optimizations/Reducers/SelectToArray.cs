@@ -37,8 +37,8 @@ public static partial class Reducers
             var idx = 0;
             do
             {
-                foreach (var item in span)
-                    result[idx++] = selector(item);
+                for(var i=0; i < span.Length; ++i)
+                    result[idx++] = selector(span[i]);
             } while (enumeratorable.TryGetNextSpan(out span));
 
             return result;
