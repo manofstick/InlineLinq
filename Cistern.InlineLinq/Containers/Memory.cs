@@ -11,6 +11,7 @@ namespace Cistern.InlineLinq
         {
             public ReadOnlySequence<T> Sequence;
             public ReadOnlySequence<T>.Enumerator Enumerator;
+            public bool MoreData;
         }
 
         private object? _internal;
@@ -58,19 +59,22 @@ namespace Cistern.InlineLinq
 
         private ReadOnlyMemory<T> _memory;
         private int _index;
+
         public void Initialize()
         {
             if (_internal != null)
             {
                 var sequence = (SequenceContainer) _internal;
                 sequence.Enumerator = sequence.Sequence.GetEnumerator();
-                if (sequence.Enumerator.MoveNext())
+                sequence.MoreData = sequence.Enumerator.MoveNext();
+                if (sequence.MoreData)
                     _memory = sequence.Enumerator.Current;
                 else
                     _memory = ReadOnlyMemory<T>.Empty;
             }
             _index = -1;
         }
+
         public void Dispose()
         {
             _index = int.MinValue;
@@ -78,6 +82,7 @@ namespace Cistern.InlineLinq
             {
                 var sequence = (SequenceContainer)_internal;
                 sequence.Enumerator = default;
+                sequence.MoreData = false;
                 _memory = ReadOnlyMemory<T>.Empty;
             }
         }
@@ -113,9 +118,35 @@ namespace Cistern.InlineLinq
             return false;
         }
 
-        public bool TryGetSpan(out ReadOnlySpan<T> span)
+        public bool TryGetNextSpan(out ReadOnlySpan<T> span)
         {
-            span = default;
+            if (_index != -1)
+            {
+                span = default;
+                return false;
+            }
+
+            span = _memory.Span;
+            _index = _memory.Length;
+
+            if (_internal is SequenceContainer sequence)
+            {
+                if (!sequence.MoreData)
+                    return false;
+
+                sequence.MoreData = sequence.Enumerator.MoveNext();
+                if (sequence.MoreData)
+                {
+                    _memory = sequence.Enumerator.Current;
+                    _index = -1;
+                }
+                else
+                {
+                    _memory = ReadOnlyMemory<T>.Empty;
+                    _index = 0;
+                }
+            }
+
             return true;
         }
     }

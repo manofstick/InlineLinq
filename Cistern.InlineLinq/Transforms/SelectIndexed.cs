@@ -42,7 +42,7 @@ public struct γSelectIndexed<T, U, TEnumeratorable>
         return false;
     }
 
-    public bool TryGetSpan(out ReadOnlySpan<U> span)
+    public bool TryGetNextSpan(out ReadOnlySpan<U> span)
     {
         span = default;
         return false;

@@ -41,7 +41,7 @@ namespace Cistern.InlineLinq
             return false;
         }
 
-        public bool TryGetSpan(out ReadOnlySpan<T> span)
+        public bool TryGetNextSpan(out ReadOnlySpan<T> span)
         {
             if (Enumerable is T[] array)
             {

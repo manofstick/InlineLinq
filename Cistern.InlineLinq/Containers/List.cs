@@ -32,9 +32,17 @@ namespace Cistern.InlineLinq
             current = default!;
             return false;
         }
-        public bool TryGetSpan(out ReadOnlySpan<T> span)
+        public bool TryGetNextSpan(out ReadOnlySpan<T> span)
         {
+            if (_index != -1)
+            {
+                span = default;
+                return false;
+            }
+
             span = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(List);
+            _index = span.Length;
+
             return true;
         }
     }

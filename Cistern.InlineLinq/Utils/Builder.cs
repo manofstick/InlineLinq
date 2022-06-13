@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace Cistern.InlineLinq.Utils;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct Elements<T>
+public ref struct Elements<T>
 {
     public T _01;
     public T _02;

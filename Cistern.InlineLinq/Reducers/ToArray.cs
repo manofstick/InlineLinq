@@ -67,7 +67,11 @@ public static partial class Reducers
         return ToArray(in enumeratorable, maybePool, upperBound);
     }
 
-    public static T[] ToArray<T, TEnumeratorable>(this in Enumeratorable<T, TEnumeratorable> source, bool usePool = false)
+    public static T[] ToArray<T, TEnumeratorable>(this in Enumeratorable<T, TEnumeratorable> source, bool usePool)
         where TEnumeratorable : struct, IEnumeratorable<T>
         => source.ToArray(usePool ? ArrayPool<T>.Shared : null);
+
+    public static T[] ToArray<T, TEnumeratorable>(this in Enumeratorable<T, TEnumeratorable> source)
+        where TEnumeratorable : struct, IEnumeratorable<T>
+        => source.ToArray(false);
 }

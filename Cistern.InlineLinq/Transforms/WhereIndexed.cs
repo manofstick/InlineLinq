@@ -48,7 +48,7 @@ public struct γWhereIndexed<T, TEnumeratorable>
         return false;
     }
 
-    public bool TryGetSpan(out ReadOnlySpan<T> span)
+    public bool TryGetNextSpan(out ReadOnlySpan<T> span)
     {
         span = default;
         return false;
