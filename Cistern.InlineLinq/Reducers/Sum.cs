@@ -1,10 +1,7 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace Cistern.InlineLinq
+﻿namespace Cistern.InlineLinq
 {
     public static partial class Reducers
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Sum<TEnumeratorable>(this in Enumeratorable<int, TEnumeratorable> source)
             where TEnumeratorable : struct, IEnumeratorable<int>
         {

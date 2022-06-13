@@ -172,17 +172,20 @@ public class ToArray
         {
             var source = Enumerable.Range(0, count);
 
-            var select = getEnumeratorable(source).Select(x => x * 2).ToArray();
-            Assert.AreEqual(count, select.Length);
+            var direct = getEnumeratorable(source).ToArray();
+            Assert.IsTrue(source.SequenceEqual(direct));
 
-            var selectWhere = getEnumeratorable(source).Select(x => x * 2).Where(x => true).ToArray();
-            Assert.AreEqual(count, selectWhere.Length);
+            var select = getEnumeratorable(source).Select(x => x).ToArray();
+            Assert.IsTrue(source.SequenceEqual(select));
+
+            var selectWhere = getEnumeratorable(source).Select(x => x).Where(x => true).ToArray();
+            Assert.IsTrue(source.SequenceEqual(selectWhere));
 
             var where = getEnumeratorable(source).Where(x => true).ToArray();
-            Assert.AreEqual(count, where.Length);
+            Assert.IsTrue(source.SequenceEqual(where));
 
-            var whereSelect = getEnumeratorable(source).Where(x => true).Select(x => x * 2).ToArray();
-            Assert.AreEqual(count, whereSelect.Length);
+            var whereSelect = getEnumeratorable(source).Where(x => true).Select(x => x).ToArray();
+            Assert.IsTrue(source.SequenceEqual(whereSelect));
         }
     }
 
@@ -194,4 +197,5 @@ public class ToArray
         DifferentLengthChecks(source => source.ToList().ToInlineLinq());
         DifferentLengthChecks(source => source.ToImmutableArray().ToInlineLinq());
     }
+
 }

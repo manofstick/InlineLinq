@@ -8,13 +8,13 @@ namespace Cistern.InlineLinq
     {
         public IEnumerable<T> Enumerable { get; }
 
-        public γEnumerable(IEnumerable<T> enumerable) => (Enumerable, _enumerator) = (enumerable, null!);
+        public γEnumerable(IEnumerable<T> enumerable) => (Enumerable, _enumerator) = (enumerable, null);
 
-        private IEnumerator<T> _enumerator;
+        private IEnumerator<T>? _enumerator;
         public void Initialize() => _enumerator = Enumerable.GetEnumerator();
         public void Dispose()
         {
-            _enumerator.Dispose();
+            _enumerator?.Dispose();
             _enumerator = null!;
         }
 
@@ -32,7 +32,7 @@ namespace Cistern.InlineLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetNext(out T current)
         {
-            if (_enumerator.MoveNext())
+            if (_enumerator!.MoveNext())
             {
                 current = _enumerator.Current;
                 return true;
@@ -43,20 +43,26 @@ namespace Cistern.InlineLinq
 
         public bool TryGetNextSpan(out ReadOnlySpan<T> span)
         {
-            if (Enumerable is T[] array)
+            if (_enumerator is not null)
             {
-                span = array.AsSpan();
-                return true;
-            }
-            else if (Enumerable is List<T> list)
-            {
-                span = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(list);
-                return true;
-            }
-            else if (Enumerable is ImmutableArray<T> immutableArray)
-            {
-                span = immutableArray.AsSpan();
-                return true;
+                if (Enumerable is T[] array)
+                {
+                    span = array.AsSpan();
+                    _enumerator = null;
+                    return true;
+                }
+                else if (Enumerable is List<T> list)
+                {
+                    span = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(list);
+                    _enumerator = null;
+                    return true;
+                }
+                else if (Enumerable is ImmutableArray<T> immutableArray)
+                {
+                    span = immutableArray.AsSpan();
+                    _enumerator = null;
+                    return true;
+                }
             }
 
             span = default;

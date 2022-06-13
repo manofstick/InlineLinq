@@ -5,69 +5,84 @@ namespace Cistern.InlineLinq;
 
 public static partial class Reducers
 {
-    private static T[] ToArray<TEnumeratorable, T>(in TEnumeratorable enumeratorable, int count)
-        where TEnumeratorable : struct, IEnumeratorable<T>
+    class VanillaToArray
     {
-        var result = new T[count];
-        var idx = 0;
-
-        var e = enumeratorable;
-        e.Initialize();
-        try
+        private static T[] KnownSize<TEnumeratorable, T>(ref TEnumeratorable enumeratorable, int count)
+            where TEnumeratorable : struct, IEnumeratorable<T>
         {
-            while (e.TryGetNext(out var item))
+            var result = new T[count];
+            if (enumeratorable.TryGetNextSpan(out var span))
+                KnownSizeWithSpan(ref enumeratorable, result, span);
+            else
+                KnownSizeByElement(ref enumeratorable, result);
+            return result;
+        }
+
+        private static void KnownSizeByElement<TEnumeratorable, T>(ref TEnumeratorable enumeratorable, T[] result)
+            where TEnumeratorable : struct, IEnumeratorable<T>
+        {
+            var idx = 0;
+            while (enumeratorable.TryGetNext(out var item))
             {
                 result[idx++] = item;
             }
-            return result;
         }
-        finally
+
+        private static void KnownSizeWithSpan<TEnumeratorable, T>(ref TEnumeratorable enumeratorable, T[] result, ReadOnlySpan<T> span)
+            where TEnumeratorable : struct, IEnumeratorable<T>
         {
-            e.Dispose();
+            var ptr = result.AsSpan();
+            do
+            {
+                span.CopyTo(ptr);
+                ptr = ptr[span.Length..];
+            } while (enumeratorable.TryGetNextSpan(out span));
         }
-    }
 
-    private static T[] ToArray<TEnumeratorable, T>(in TEnumeratorable enumeratorable, ArrayPool<T>? maybePool, int? upperBound)
-        where TEnumeratorable : struct, IEnumeratorable<T>
-    {
-        var stackallocation = new Builder<T>.MemoryChunk();
-
-        var e = enumeratorable;
-        e.Initialize();
-        try
+        private static T[] UseBuilder<TEnumeratorable, T>(ref TEnumeratorable enumeratorable, ArrayPool<T>? maybePool, int? upperBound)
+            where TEnumeratorable : struct, IEnumeratorable<T>
         {
+            var stackallocation = new Builder<T>.MemoryChunk();
             using var builder = new Builder<T>(maybePool, stackallocation.GetBufferofBuffers(), stackallocation.GetBufferOfItems(), upperBound);
 
-            while (e.TryGetNext(out var item))
+            while (enumeratorable.TryGetNext(out var item))
                 builder.Add(item);
 
             return builder.ToArray();
         }
-        finally
+
+        public static T[] ToArray<T, TEnumeratorable>(in Enumeratorable<T, TEnumeratorable> source, ArrayPool<T>? maybePool)
+            where TEnumeratorable : struct, IEnumeratorable<T>
         {
-            e.Dispose();
+            var enumeratorable = source.Inner;
+
+            enumeratorable.Initialize();
+            try
+            {
+                var maybeCount = enumeratorable.TryGetCount(out var upperBound);
+                if (maybeCount.HasValue)
+                {
+                    var count = maybeCount.Value;
+                    if (count == 0)
+                        return Array.Empty<T>();
+
+                    return KnownSize<TEnumeratorable, T>(ref enumeratorable, count);
+                }
+
+                return UseBuilder(ref enumeratorable, maybePool, upperBound);
+            }
+            finally
+            {
+                enumeratorable.Dispose();
+            }
         }
     }
 
     public static T[] ToArray<T, TEnumeratorable>(this in Enumeratorable<T, TEnumeratorable> source, ArrayPool<T>? maybePool)
         where TEnumeratorable : struct, IEnumeratorable<T>
-    {
-        var enumeratorable = source.Inner;
-
-        var maybeCount = enumeratorable.TryGetCount(out var upperBound);
-        if (maybeCount.HasValue)
-        {
-            var count = maybeCount.Value;
-            if (count == 0)
-                return Array.Empty<T>();
-
-            return ToArray<TEnumeratorable, T>(in enumeratorable, count);
-        }
-
-        return ToArray(in enumeratorable, maybePool, upperBound);
-    }
+        => VanillaToArray.ToArray(in source, maybePool);
 
     public static T[] ToArray<T, TEnumeratorable>(this in Enumeratorable<T, TEnumeratorable> source, bool usePool = false)
         where TEnumeratorable : struct, IEnumeratorable<T>
-        => source.ToArray(usePool ? ArrayPool<T>.Shared : null);
+        => ToArray(in source, usePool ? ArrayPool<T>.Shared : null);
 }
