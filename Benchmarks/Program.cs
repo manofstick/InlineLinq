@@ -8,11 +8,11 @@ namespace Benchmarks
     {
         public static void Main(string[] args)
         {
-            var x = new ArrayWhereSelectToArray();
+            var x = new ListWhereSelectAggregate();
             x.N = 1000;
             x.GlobalSetup();
 
-            var summary = BenchmarkRunner.Run<ListWhereSelectToArray>();
+            var summary = BenchmarkRunner.Run<ListWhereSelectAggregate>();
         }
     }
 }

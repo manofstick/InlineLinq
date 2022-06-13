@@ -31,9 +31,14 @@ namespace Cistern.InlineLinq
         public static Enumeratorable<T, γList<T>> ToInlineLinq<T>(this List<T> source) => new(new(source));
         public static Enumeratorable<T, γEnumerable<T>> ToInlineLinq<T>(this IEnumerable<T> source) => new(new(source));
 
+        // --
+
+        // ** `TAccumulate Aggregate<TSource, TAccumulate>(this IEnumerable<TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func);`
+        // ** `TSource[] ToArray<TSource>(this IEnumerable<TSource> source);`
+        // ** `List<TSource> ToList<TSource>(this IEnumerable<TSource> source);`
+
         // ----------------------------------------------------------------------------------------------------------
 
-        // `TAccumulate Aggregate<TSource, TAccumulate>(this IEnumerable<TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func);`
         // `TResult Aggregate<TSource, TAccumulate, TResult>(this IEnumerable<TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, Func<TAccumulate, TResult> resultSelector);`
         // `bool All<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate);`
         // `bool Any<TSource>(this IEnumerable<TSource> source);`
@@ -224,14 +229,12 @@ namespace Cistern.InlineLinq
         // `IOrderedEnumerable<TSource> ThenBy<TSource, TKey>(this IOrderedEnumerable<TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer);`
         // `IOrderedEnumerable<TSource> ThenByDescending<TSource, TKey>(this IOrderedEnumerable<TSource> source, Func<TSource, TKey> keySelector);`
         // `IOrderedEnumerable<TSource> ThenByDescending<TSource, TKey>(this IOrderedEnumerable<TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer);`
-        // `TSource[] ToArray<TSource>(this IEnumerable<TSource> source);`
         // `Dictionary<TKey, TSource> ToDictionary<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector) where TKey : notnull;`
         // `Dictionary<TKey, TSource> ToDictionary<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer) where TKey : notnull;`
         // `Dictionary<TKey, TElement> ToDictionary<TSource, TKey, TElement>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector) where TKey : notnull;`
         // `Dictionary<TKey, TElement> ToDictionary<TSource, TKey, TElement>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey>? comparer) where TKey : notnull;`
         // `HashSet<TSource> ToHashSet<TSource>(this IEnumerable<TSource> source, IEqualityComparer<TSource>? comparer);`
         // `HashSet<TSource> ToHashSet<TSource>(this IEnumerable<TSource> source);`
-        // `List<TSource> ToList<TSource>(this IEnumerable<TSource> source);`
         // `ILookup<TKey, TElement> ToLookup<TSource, TKey, TElement>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey>? comparer);`
         // `ILookup<TKey, TElement> ToLookup<TSource, TKey, TElement>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector);`
         // `ILookup<TKey, TSource> ToLookup<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector);`
