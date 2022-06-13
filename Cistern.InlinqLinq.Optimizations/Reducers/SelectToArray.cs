@@ -12,7 +12,7 @@ public static partial class Reducers
             where TEnumeratorable : struct, IEnumeratorable<T>
         {
             Builder<U>.MemoryChunk memoryChunk = new();
-            var builder = new Builder<U>(maybeArrayPool, memoryChunk.GetBufferofBuffers(), memoryChunk.GetBufferOfItems(), upperBound);
+            using var builder = new Builder<U>(maybeArrayPool, memoryChunk.GetBufferofBuffers(), memoryChunk.GetBufferOfItems(), upperBound);
             while (enumeratorable.TryGetNext(out var item))
             {
                 builder.Add(selector(item));
