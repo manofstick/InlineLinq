@@ -1,4 +1,7 @@
-﻿namespace Cistern.InlineLinq.Tests.Vanilla;
+﻿namespace InlineLinq.Tests.Vanilla;
+
+using Cistern.InlineLinq;
+using Cistern.InlineLinq.Transforms;
 
 [TestClass]
 public class SelectIndexed
@@ -18,7 +21,7 @@ public class SelectIndexed
         UsingStructEnumerator(select);
         UsingEnumerable(select.GetEnumerable());
 
-        static void UsingStructEnumerator(in Enumeratorable<bool, Transforms.γSelectIndexed<int, bool, TEnumeratorable>> select)
+        static void UsingStructEnumerator(in Enumeratorable<bool, γSelectIndexed<int, bool, TEnumeratorable>> select)
         {
             foreach (var item in select)
                 Assert.Fail();
@@ -41,7 +44,7 @@ public class SelectIndexed
         UsingStructEnumerator(select);
         UsingEnumerable(select.GetEnumerable());
 
-        static void UsingStructEnumerator(in Enumeratorable<decimal, Transforms.γSelectIndexed<int, decimal, TEnumeratorable>> select)
+        static void UsingStructEnumerator(in Enumeratorable<decimal, γSelectIndexed<int, decimal, TEnumeratorable>> select)
         {
             var count = 0;
             foreach (var item in select)

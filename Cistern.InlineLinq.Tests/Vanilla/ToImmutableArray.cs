@@ -1,6 +1,7 @@
-﻿using System.Collections.Immutable;
+﻿namespace InlineLinq.Tests.Vanilla;
 
-namespace Cistern.InlineLinq.Tests.Vanilla;
+using System.Collections.Immutable;
+using Cistern.InlineLinq;
 
 [TestClass]
 public class ToImmutableArray

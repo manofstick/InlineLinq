@@ -6,61 +6,77 @@ namespace Cistern.InlineLinq.Optimizations;
 
 public static partial class Reducers
 {
-    private static U[] ToArray<T, U>(ReadOnlySpan<T> span, Func<T, bool> predicate, Func<T, U> selector)
+    class SelectWhereToArray
     {
-        var pool = ArrayPool<U>.Shared;
-        var buffer = pool.Rent(span.Length);
-        try
+        private static U[] PopulateViaBuilder<TEnumeratorable, T, U>(ref TEnumeratorable enumeratorable, Func<T, bool> predicate, Func<T, U> selector, ArrayPool<U>? maybeArrayPool, int? upperBound)
+            where TEnumeratorable : struct, IEnumeratorable<T>
         {
-            var idx = 0;
-            foreach (var item in span)
+            Builder<U>.MemoryChunk memoryChunk = new();
+            var builder = new Builder<U>(maybeArrayPool, memoryChunk.GetBufferofBuffers(), memoryChunk.GetBufferOfItems(), upperBound);
+
+            if (enumeratorable.TryGetNextSpan(out var span))
+            {
+                PopulateBuilderViaTryGetNextSpan(ref enumeratorable, ref builder, predicate, selector, span);
+            }
+            else
+            {
+                PopulateBuilderViaTryGetNext(ref enumeratorable, ref builder, predicate, selector);
+            }
+
+            return builder.ToArray();
+        }
+
+        private static void PopulateBuilderViaTryGetNext<TEnumeratorable, T, U>(ref TEnumeratorable enumeratorable, ref Builder<U> builder, Func<T, bool> predicate, Func<T, U> selector) where TEnumeratorable : struct, IEnumeratorable<T>
+        {
+            while (enumeratorable.TryGetNext(out var item))
             {
                 if (predicate(item))
-                    buffer[idx++] = selector(item);
+                    builder.Add(selector(item));
             }
-            return buffer.AsSpan(0, idx).ToArray();
         }
-        finally
+
+        private static void PopulateBuilderViaTryGetNextSpan<TEnumeratorable, T, U>(ref TEnumeratorable enumeratorable, ref Builder<U> builder, Func<T, bool> predicate, Func<T, U> selector, ReadOnlySpan<T> span)
+            where TEnumeratorable : struct, IEnumeratorable<T>
         {
-            pool.Return(buffer);
+            do
+            {
+                foreach (var item in span)
+                {
+                    if (predicate(item))
+                        builder.Add(selector(item));
+                }
+            } while (enumeratorable.TryGetNextSpan(out span));
+        }
+
+        public static U[] ToArray<T, U, TEnumeratorable>(in Enumeratorable<U, γSelect<T, U, γWhere<T, TEnumeratorable>>> source, ArrayPool<U>? maybeArrayPool)
+            where TEnumeratorable : struct, IEnumeratorable<T>
+        {
+            var select = source.Inner;
+            var where = select.Inner;
+            var enumeratorable = where.Inner;
+
+            enumeratorable.Initialize();
+            try
+            {
+                var maybeCount = enumeratorable.TryGetCount(out var upperBound);
+                if (maybeCount == 0)
+                    return Array.Empty<U>();
+
+                return PopulateViaBuilder(ref enumeratorable, where.Predicate, select.Selector, maybeArrayPool, upperBound);
+            }
+            finally
+            {
+                enumeratorable.Dispose();
+            }
         }
     }
 
-    private static U[] ToArray<TEnumeratorable, T, U>(TEnumeratorable enumeratorable, Func<T, bool> predicate, Func<T, U> selector, ArrayPool<U>? maybeArrayPool, int? upperBound)
-        where TEnumeratorable : struct, IEnumeratorable<T>
-    {
-        Builder<U>.MemoryChunk memoryChunk = new();
-        var builder = new Builder<U>(maybeArrayPool, memoryChunk.GetBufferofBuffers(), memoryChunk.GetBufferOfItems(), upperBound);
-        while (enumeratorable.TryGetNext(out var item))
-        {
-            if (predicate(item))
-                builder.Add(selector(item));
-        }
-        return builder.ToArray();
-    }
+    public static U[] ToArray<T, U, TEnumeratorable>(this in Enumeratorable<U, γSelect<T, U, γWhere<T, TEnumeratorable>>> source, ArrayPool<U>? maybeArrayPool)
+        where TEnumeratorable : struct, IEnumeratorable<T> => SelectWhereToArray.ToArray(in source, maybeArrayPool);
+
+    public static U[] ToArray<T, U, TEnumeratorable>(this in Enumeratorable<U, γSelect<T, U, γWhere<T, TEnumeratorable>>> source, bool usePool)
+        where TEnumeratorable : struct, IEnumeratorable<T> => ToArray(in source, usePool ? ArrayPool<U>.Shared : null);
 
     public static U[] ToArray<T, U, TEnumeratorable>(this in Enumeratorable<U, γSelect<T, U, γWhere<T, TEnumeratorable>>> source)
-        where TEnumeratorable : struct, IEnumeratorable<T>
-    {
-        var select = source.Inner;
-        var where = select.Inner;
-        var enumeratorable = where.Inner;
-
-        if (enumeratorable.TryGetNextSpan(out var span))
-        {
-            if (span.Length == 0)
-                return Array.Empty<U>();
-
-            return ToArray(span, where.Predicate, select.Selector);
-        }
-        else
-        {
-            var maybeCount = enumeratorable.TryGetCount(out var upperBound);
-            if (maybeCount == 0)
-                return Array.Empty<U>();
-
-            return ToArray(enumeratorable, where.Predicate, select.Selector, null, upperBound);
-        }
-    }
-
+        where TEnumeratorable : struct, IEnumeratorable<T> => ToArray(in source, false);
 }

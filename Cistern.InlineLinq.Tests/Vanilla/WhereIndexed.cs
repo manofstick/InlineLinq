@@ -1,4 +1,7 @@
-﻿namespace Cistern.InlineLinq.Tests.Vanilla;
+﻿namespace InlineLinq.Tests.Vanilla;
+
+using Cistern.InlineLinq;
+using Cistern.InlineLinq.Transforms;
 
 [TestClass]
 public class WhereIndexed
@@ -18,7 +21,7 @@ public class WhereIndexed
         UsingStructEnumerator(where);
         UsingEnumerable(where.GetEnumerable());
 
-        static void UsingStructEnumerator(in Enumeratorable<int, Transforms.γWhereIndexed<int, TEnumeratorable>> where)
+        static void UsingStructEnumerator(in Enumeratorable<int, γWhereIndexed<int, TEnumeratorable>> where)
         {
             foreach (var item in where)
                 Assert.Fail();
@@ -41,7 +44,7 @@ public class WhereIndexed
         UsingStructEnumerator(where);
         UsingEnumerable(where.GetEnumerable());
 
-        static void UsingStructEnumerator(in Enumeratorable<int, Transforms.γWhereIndexed<int, TEnumeratorable>> where)
+        static void UsingStructEnumerator(in Enumeratorable<int, γWhereIndexed<int, TEnumeratorable>> where)
         {
             var check = 0;
             var count = 0;
