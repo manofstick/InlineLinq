@@ -84,6 +84,12 @@ public static partial class Reducers
         }
     }
 
+    public static U[] ToArray<T, U, TEnumeratorable>(this in Enumeratorable<U, γSelect<T, U, TEnumeratorable>> source, ArrayPool<U>? _/*ignore*/)
+        where TEnumeratorable : struct, IEnumeratorable<T> => SelectToArray.ToArray(in source);
+
+    public static U[] ToArray<T, U, TEnumeratorable>(this in Enumeratorable<U, γSelect<T, U, TEnumeratorable>> source, bool _/*ignore*/)
+        where TEnumeratorable : struct, IEnumeratorable<T> => SelectToArray.ToArray(in source);
+
     public static U[] ToArray<T, U, TEnumeratorable>(this in Enumeratorable<U, γSelect<T, U, TEnumeratorable>> source)
         where TEnumeratorable : struct, IEnumeratorable<T> => SelectToArray.ToArray(in source);
 }
