@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Cistern.InlineLinq\Cistern.InlineLinq.csproj" />
-    <ProjectReference Include="..\Cistern.InlinqLinq.Optimizations\Cistern.InlineLinq.Optimizations.csproj" />
   </ItemGroup>
 
 </Project>

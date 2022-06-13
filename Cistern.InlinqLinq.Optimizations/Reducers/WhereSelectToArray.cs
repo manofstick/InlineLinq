@@ -6,7 +6,7 @@ namespace Cistern.InlineLinq.Optimizations;
 
 public static partial class Reducers
 {
-    class SelectWhereToArray
+    class WhereSelectToArray
     {
         private static U[] PopulateViaBuilder<TEnumeratorable, T, U>(ref TEnumeratorable enumeratorable, Func<T, bool> predicate, Func<T, U> selector, ArrayPool<U>? maybeArrayPool, int? upperBound)
             where TEnumeratorable : struct, IEnumeratorable<T>
@@ -77,7 +77,7 @@ public static partial class Reducers
     }
 
     public static U[] ToArray<T, U, TEnumeratorable>(this in Enumeratorable<U, γSelect<T, U, γWhere<T, TEnumeratorable>>> source, ArrayPool<U>? maybeArrayPool)
-        where TEnumeratorable : struct, IEnumeratorable<T> => SelectWhereToArray.ToArray(in source, maybeArrayPool);
+        where TEnumeratorable : struct, IEnumeratorable<T> => WhereSelectToArray.ToArray(in source, maybeArrayPool);
 
     public static U[] ToArray<T, U, TEnumeratorable>(this in Enumeratorable<U, γSelect<T, U, γWhere<T, TEnumeratorable>>> source, bool usePool)
         where TEnumeratorable : struct, IEnumeratorable<T> => ToArray(in source, usePool ? ArrayPool<U>.Shared : null);

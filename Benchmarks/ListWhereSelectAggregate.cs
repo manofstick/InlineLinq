@@ -2,7 +2,6 @@
 using NetFabric.Hyperlinq;
 using StructLinq;
 using Cistern.InlineLinq;
-using Cistern.InlineLinq.Optimizations;
 
 namespace Benchmarks
 {

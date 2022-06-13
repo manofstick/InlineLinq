@@ -4,7 +4,7 @@ namespace Cistern.InlineLinq.Optimizations;
 
 public static partial class Reducers
 {
-    class SelectWhereAggregate
+    class WhereSelectAggregate
     {
         public static TAccumulate Aggregate<TEnumeratorable, T, TSource, TAccumulate>(in Enumeratorable<TSource, γSelect<T, TSource, γWhere<T, TEnumeratorable>>> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func)
             where TEnumeratorable : struct, IEnumeratorable<T>
@@ -56,5 +56,5 @@ public static partial class Reducers
     }
 
     public static TAccumulate Aggregate<TEnumeratorable, T, TSource, TAccumulate>(this in Enumeratorable<TSource, γSelect<T, TSource, γWhere<T, TEnumeratorable>>> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func)
-        where TEnumeratorable : struct, IEnumeratorable<T> => SelectWhereAggregate.Aggregate(in source, seed, func);
+        where TEnumeratorable : struct, IEnumeratorable<T> => WhereSelectAggregate.Aggregate(in source, seed, func);
 }

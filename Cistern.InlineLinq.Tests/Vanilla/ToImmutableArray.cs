@@ -34,6 +34,18 @@ public class ToImmutableArray
     static private void RunChecks<TEnumeratorable>(IEnumerable<int> enumerable, in Enumeratorable<int, TEnumeratorable> enumeratorable)
         where TEnumeratorable : struct, IEnumeratorable<int>
     {
+        {
+            var expected =
+                enumerable
+                .ToImmutableArray();
+
+            var check =
+                enumeratorable
+                .ToImmutableArray();
+
+            Assert.IsTrue(System.Linq.Enumerable.SequenceEqual(expected, check));
+        }
+
         foreach (var where in Wheres)
         {
             var expected =

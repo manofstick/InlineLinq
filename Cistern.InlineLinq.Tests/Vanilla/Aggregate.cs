@@ -4,18 +4,18 @@ using System.Collections.Immutable;
 using Cistern.InlineLinq;
 
 [TestClass]
-public class ToArray
+public class Aggregate
 {
     [TestMethod]
     public void EmptyReturnsArrayDotEmpty()
     {
-        var shouldBeEmpty =
+        var shouldBeMinValue =
             System.Linq.Enumerable.Range(0, 100)
             .ToInlineLinq()
             .Where(_ => false)
-            .ToArray();
+            .Aggregate(int.MinValue, (a, c) => a + c);
 
-        Assert.AreSame(Array.Empty<int>(), shouldBeEmpty);
+        Assert.AreEqual(int.MinValue, shouldBeMinValue);
     }
 
     static readonly IEnumerable<int>[] Sources = new IEnumerable<int>[]
@@ -49,13 +49,13 @@ public class ToArray
         {
             var expected =
                 enumerable
-                .ToArray();
+                .Aggregate(42, (a, c) => a + c);
 
             var check =
                 enumeratorable
-                .ToArray();
+                .Aggregate(42, (a, c) => a + c);
 
-            Assert.IsTrue(System.Linq.Enumerable.SequenceEqual(expected, check));
+            Assert.AreEqual(expected, check);
         }
 
         foreach (var where in Wheres)
@@ -63,14 +63,14 @@ public class ToArray
             var expected =
                 enumerable
                 .Where(where)
-                .ToArray();
+                .Aggregate(42, (a, c) => a+c);
 
             var check =
                 enumeratorable
                 .Where(where)
-                .ToArray();
+                .Aggregate(42, (a, c) => a + c);
 
-            Assert.IsTrue(System.Linq.Enumerable.SequenceEqual(expected, check));
+            Assert.AreEqual(expected, check);
         }
 
         foreach (var select in Selects)
@@ -78,14 +78,14 @@ public class ToArray
             var expected =
                 enumerable
                 .Select(select)
-                .ToArray();
+                .Aggregate(42, (a, c) => a + c);
 
             var check =
                 enumeratorable
                 .Select(select)
-                .ToArray();
+                .Aggregate(42, (a, c) => a + c);
 
-            Assert.IsTrue(System.Linq.Enumerable.SequenceEqual(expected, check));
+            Assert.AreEqual(expected, check);
         }
 
         foreach (var where in Wheres)
@@ -96,15 +96,15 @@ public class ToArray
                     enumerable
                     .Where(where)
                     .Select(select)
-                    .ToArray();
+                    .Aggregate(42, (a, c) => a + c);
 
                 var check =
                     enumeratorable
                     .Where(where)
                     .Select(select)
-                    .ToArray();
+                    .Aggregate(42, (a, c) => a + c);
 
-                Assert.IsTrue(System.Linq.Enumerable.SequenceEqual(expected, check));
+                Assert.AreEqual(expected, check);
             }
         }
 
@@ -116,15 +116,15 @@ public class ToArray
                     enumerable
                     .Select(select)
                     .Where(where)
-                    .ToArray();
+                    .Aggregate(42, (a, c) => a + c);
 
                 var check =
                     enumeratorable
                     .Select(select)
                     .Where(where)
-                    .ToArray();
+                    .Aggregate(42, (a, c) => a + c);
 
-                Assert.IsTrue(System.Linq.Enumerable.SequenceEqual(expected, check));
+                Assert.AreEqual(expected, check);
             }
         }
     }
@@ -135,7 +135,7 @@ public class ToArray
         static Enumeratorable<int, γMemory<int>> getContainer(IEnumerable<int> e) =>
             System.Linq.Enumerable.ToArray(e).ToInlineLinq();
 
-        foreach(var source in Sources)
+        foreach (var source in Sources)
             RunChecks(source, getContainer(source));
     }
 
@@ -176,38 +176,4 @@ public class ToArray
         foreach (var source in Sources)
             RunChecks(source, getContainer(source));
     }
-
-    static private void DifferentLengthChecks<TEnumeratorable>(Func<IEnumerable<int>, Enumeratorable<int, TEnumeratorable>> getEnumeratorable)
-        where TEnumeratorable : struct, IEnumeratorable<int>
-    {
-        for (var count = 0; count < 200; ++count)
-        {
-            var source = Enumerable.Range(0, count);
-
-            var direct = getEnumeratorable(source).ToArray();
-            Assert.IsTrue(source.SequenceEqual(direct));
-
-            var select = getEnumeratorable(source).Select(x => x).ToArray();
-            Assert.IsTrue(source.SequenceEqual(select));
-
-            var selectWhere = getEnumeratorable(source).Select(x => x).Where(x => true).ToArray();
-            Assert.IsTrue(source.SequenceEqual(selectWhere));
-
-            var where = getEnumeratorable(source).Where(x => true).ToArray();
-            Assert.IsTrue(source.SequenceEqual(where));
-
-            var whereSelect = getEnumeratorable(source).Where(x => true).Select(x => x).ToArray();
-            Assert.IsTrue(source.SequenceEqual(whereSelect));
-        }
-    }
-
-    [TestMethod]
-    public void TryDifferentLengthBoundaries()
-    {
-        DifferentLengthChecks(source => source.ToArray().ToInlineLinq());
-        DifferentLengthChecks(source => source.ToInlineLinq());
-        DifferentLengthChecks(source => source.ToList().ToInlineLinq());
-        DifferentLengthChecks(source => source.ToImmutableArray().ToInlineLinq());
-    }
-
 }

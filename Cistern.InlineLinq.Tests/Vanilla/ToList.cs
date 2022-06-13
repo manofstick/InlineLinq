@@ -35,6 +35,18 @@ public class ToList
     static private void RunChecks<TEnumeratorable>(IEnumerable<int> enumerable, in Enumeratorable<int, TEnumeratorable> enumeratorable)
         where TEnumeratorable : struct, IEnumeratorable<int>
     {
+        {
+            var expected =
+                enumerable
+                .ToList();
+
+            var check =
+                enumeratorable
+                .ToList();
+
+            Assert.IsTrue(System.Linq.Enumerable.SequenceEqual(expected, check));
+        }
+
         foreach (var where in Wheres)
         {
             var expected =
