@@ -196,7 +196,11 @@ namespace Cistern.InlineLinq
         // `TSource SingleOrDefault<TSource>(this IEnumerable<TSource> source, TSource defaultValue);`
         // `TSource? SingleOrDefault<TSource>(this IEnumerable<TSource> source);`
         // `TSource? SingleOrDefault<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate);`
-        // `IEnumerable<TSource> Skip<TSource>(this IEnumerable<TSource> source, int count);`
+
+        public static Enumeratorable<T, γSkip<T, TEnumeratorable>> Skip<T, TEnumeratorable>(this in Enumeratorable<T, TEnumeratorable> source, int count)
+            where TEnumeratorable : struct, IEnumeratorable<T> =>
+            new(new(source.Inner, count));
+
         // `IEnumerable<TSource> SkipLast<TSource>(this IEnumerable<TSource> source, int count);`
         // `IEnumerable<TSource> SkipWhile<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate);`
         // `IEnumerable<TSource> SkipWhile<TSource>(this IEnumerable<TSource> source, Func<TSource, int, bool> predicate);`

@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Cistern.InlineLinq\Cistern.InlineLinq.csproj" />
+    <ProjectReference Include="..\Cistern.InlinqLinq.Optimizations\Cistern.InlineLinq.Optimizations.csproj" />
   </ItemGroup>
 
 </Project>
